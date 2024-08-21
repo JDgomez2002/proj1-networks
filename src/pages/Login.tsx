@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { client } from "@xmpp/client";
 import { toast } from "sonner";
 
-const XMPP_SERVICE = import.meta.env.VITE_XMPP_SERVICE;
-const XMPP_DOMAIN = import.meta.env.VITE_XMPP_DOMAIN;
+// const XMPP_SERVICE = import.meta.env.VITE_XMPP_SERVICE;
+const XMPP_SERVICE = "ws://alumchat.lol:7070/ws/";
+// const XMPP_DOMAIN = import.meta.env.VITE_XMPP_DOMAIN;
+const XMPP_DOMAIN = "alumchat.lol";
 
 function Login() {
   const navigate = useNavigate();
@@ -30,20 +32,28 @@ function Login() {
     // Guardar en sessionStorage
     sessionStorage.setItem("username", username);
     sessionStorage.setItem("password", password);
+    toast("Welcome back 🎉", {
+      // description: "Error loging in",
+      // action: {
+      //   label: "Try again",
+      //   onClick: () => handleLogin(e),
+      // },
+    });
     navigate("/app"); // Navega a la página principal después de iniciar sesión correctamente
   });
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
       await xmppClient.start();
     } catch (e) {
       console.log("Error loging in:", e);
       toast("Can't sign in right now 🚨", {
         description: "Error loging in",
-        action: {
-          label: "Try again",
-          onClick: () => handleLogin(),
-        },
+        // action: {
+        //   label: "Try again",
+        //   onClick: () => handleLogin(e),
+        // },
       });
     }
   };
@@ -59,9 +69,9 @@ function Login() {
           <article className="flex flex-col gap-2">
             <label htmlFor="email">Email</label>
             <input
-              id="email"
-              type="email"
-              name="email"
+              id="username"
+              type="text"
+              name="username"
               onChange={(e) => setUsername(e.target.value)}
               required
               className="py-2 px-3 rounded-md focus:outline-bg-blue-950"

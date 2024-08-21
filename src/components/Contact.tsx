@@ -9,7 +9,7 @@ function Contact({ user }: Props) {
 
   return (
     <Link
-      to={`/chat/${user.id}`}
+      to={`/app/chat/${user.id}`}
       className={`p-4 block h-fit w-full border rounded-md transition-colors duration-300 ease-in-out ${
         id === user.id
           ? "bg-blue-900 border-gray-400"
