@@ -18,9 +18,9 @@ function Contact({ contact }: Props) {
     >
       <h3 className="text-gray-400">{contact.email}</h3>
       {contact?.status ? (
-        <span className="bg-green-600 text-white rounded-full h-3 w-3"></span>
+        <span className="bg-green-600 text-white rounded-full h-2 w-3"></span>
       ) : (
-        <span className="bg-gray-500 text-white rounded-full h-3 w-3"></span>
+        <span className="bg-gray-500 text-white rounded-full h-2 w-3"></span>
       )}
       {contact?.unread && (
         <span className="bg-blue-500 text-white rounded-full h-4 w-4 my-auto"></span>
