@@ -1,12 +1,28 @@
 import { useParams } from "react-router-dom";
 import { Message } from "./";
 import { useRef, useEffect } from "react";
+import contactsStore from "../stores/contacts.store";
+import messagesStore from "../stores/messages.store";
 
 function Chat() {
   const { id } = useParams();
 
   const messagesContainerRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const messages = messagesStore((state) => state.messages);
+
+  const contacts = contactsStore((state) => state.contacts);
+  const currentContact = contactsStore((state) => state.currentContact);
+  const setCurrentContact = contactsStore((state) => state.setCurrentContact);
+  const updateReadStatus = contactsStore((state) => state.updateReadStatus);
+
+  useEffect(() => {
+    const contact = contacts?.find((contact) => contact.id === id);
+    if (!id || !contact) return;
+    setCurrentContact(contact);
+    updateReadStatus(id, false);
+  }, [id]);
 
   useEffect(() => {
     // scroll to the bottom of the chat when the component renders
@@ -18,31 +34,42 @@ function Chat() {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [messagesContainerRef, inputRef]);
+  }, [messagesContainerRef, inputRef, messages]);
+
+  if (!currentContact) {
+    return (
+      <article className="h-full w-full flex items-center justify-center">
+        Loading chat...
+      </article>
+    );
+  }
 
   return (
     <article className="h-full overflow-hidden flex flex-col">
       <div className="bg-[#00798c] px-4 py-4">
-        <h1 className="text-3xl text-gray-300 font-semibold">Chat {id}</h1>
+        <h1 className="text-3xl text-gray-300 font-semibold">
+          {currentContact.name}
+        </h1>
       </div>
-      <section ref={messagesContainerRef} className="overflow-y-auto">
-        <ul className="flex flex-1 flex-col gap-2 py-4 px-2">
-          {Array.from({ length: 100 }, (_, i) => (
-            <li key={i}>
-              <Message
-                message={{
-                  id: `${i}`,
-                  content: `content ${i}`,
-                  date: new Date(),
-                  from: "sender",
-                  to: "receiver",
-                }}
-              />
-            </li>
-          ))}
+      <section
+        ref={messagesContainerRef}
+        className="overflow-y-auto flex flex-col flex-1"
+      >
+        <ul className="flex justify-end flex-1 flex-col gap-2 p-2 mt-auto">
+          {messages ? (
+            messages
+              .filter((message) => currentContact.email === message.from)
+              .map((message, key) => (
+                <li key={key}>
+                  <Message message={message} />
+                </li>
+              ))
+          ) : (
+            <li>Loading...</li>
+          )}
         </ul>
       </section>
-      <section className="h-24 w-full flex">
+      <section className="h-16 w-full flex">
         <input
           ref={inputRef}
           type="text"

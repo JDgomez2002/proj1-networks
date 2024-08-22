@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { Contact } from "../components";
+import contactsStore from "../stores/contacts.store";
 
 function Contacts() {
+  const contacts = contactsStore((state) => state.contacts);
+
   return (
     <nav className="bg-[#12455e] border border-gray-600 w-96 h-full rounded-lg overflow-hidden">
       <Link to="/">
@@ -10,13 +13,15 @@ function Contacts() {
         </h1>
       </Link>
       <ul className="flex flex-col gap-2 py-4 px-2 overflow-y-auto h-full">
-        {Array.from({ length: 100 }, (_, i) => (
-          <li key={i}>
-            <Contact
-              user={{ id: `${i}`, email: `email${i}`, name: `name ${i}` }}
-            />
-          </li>
-        ))}
+        {contacts ? (
+          contacts.map((contact, key) => (
+            <li key={key}>
+              <Contact contact={contact} />
+            </li>
+          ))
+        ) : (
+          <li>Loading...</li>
+        )}
       </ul>
     </nav>
   );

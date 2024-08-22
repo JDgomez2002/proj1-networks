@@ -1,8 +1,18 @@
 declare global {
   interface User {
-    id: string;
-    name: string;
+    id?: string;
+    name?: string;
     email: string;
+    password: string;
+  }
+
+  interface Contact {
+    id: string;
+    email: string;
+    name?: string;
+    presence?: string;
+    status?: string;
+    unread?: boolean;
   }
 
   interface Message {
@@ -10,7 +20,7 @@ declare global {
     content: string;
     date: Date;
     from: User.id;
-    to: User.id;
+    // to: User.id;
   }
 }
 
