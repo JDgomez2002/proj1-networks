@@ -20,6 +20,7 @@ declare global {
     content: string;
     date: Date;
     from: User.id;
+    unread: boolean;
     // to: User.id;
   }
 }

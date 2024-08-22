@@ -118,10 +118,11 @@ export default function useXMPPClient() {
             from,
             content: body,
             date: new Date(),
+            unread: false,
           };
           const currentContact = contactsStore.getState().currentContact;
-          console.log("currentContact:", currentContact);
           if (currentContact?.email !== from) {
+            message.unread = true;
             updateReadStatus(from, true);
           }
           // contact the message to messages store

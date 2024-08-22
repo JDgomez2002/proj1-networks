@@ -1,4 +1,5 @@
 import { Link, useParams } from "react-router-dom";
+import messagesStore from "../stores/messages.store";
 
 interface Props {
   contact: Contact;
@@ -6,6 +7,8 @@ interface Props {
 
 function Contact({ contact }: Props) {
   const { id } = useParams();
+
+  const messages = messagesStore((state) => state.messages);
 
   return (
     <Link
@@ -18,12 +21,14 @@ function Contact({ contact }: Props) {
     >
       <h3 className="text-gray-400">{contact.email}</h3>
       {contact?.status ? (
-        <span className="bg-green-600 text-white rounded-full h-2 w-3"></span>
+        <span className="bg-green-500 text-white rounded-full h-2 w-2"></span>
       ) : (
-        <span className="bg-gray-500 text-white rounded-full h-2 w-3"></span>
+        <span className="bg-gray-500 text-white rounded-full h-2 w-2"></span>
       )}
       {contact?.unread && (
-        <span className="bg-blue-500 text-white rounded-full h-4 w-4 my-auto"></span>
+        <span className="bg-blue-600 text-white rounded-full text-md h-6 w-6 text-center my-auto">
+          {messages?.filter((message) => message.from === contact.id).length}
+        </span>
       )}
     </Link>
   );
