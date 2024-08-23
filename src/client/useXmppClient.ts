@@ -107,7 +107,7 @@ export default function useXMPPClient() {
           const from = stanza.attr("from").split("/")[0];
           const body = stanza.getChild("body")?.text() ?? "";
           // console.log("stanza:", stanza);
-          console.log("Message from:", from, "Body:", body);
+          // console.log("Message from:", from, "Body:", body);
           toast(`${from.split("@")[0]} 💬`, {
             description: body,
             action: {
@@ -118,6 +118,7 @@ export default function useXMPPClient() {
           const message: Message = {
             id,
             from,
+            to: email,
             content: body,
             date: new Date(),
             unread: false,
@@ -156,6 +157,7 @@ export default function useXMPPClient() {
                 { value: "dnd", status: "Busy" },
                 { value: "xa", status: "Not available" },
               ];
+              const contacts = contactsStore.getState().contacts;
               status =
                 statusCases.find((item) => item.value === status)?.status ??
                 "Online";
@@ -166,9 +168,7 @@ export default function useXMPPClient() {
                 status,
                 presence: presenceMessage ?? "",
               };
-              const contacts = contactsStore.getState().contacts;
               // update contact status but not added again to the contacts list
-              console.log("from:", from, "- email:", email);
               if (from.split("@")[0] !== email)
                 setContacts([
                   ...(contacts?.filter((c) => c.id !== from) ?? []),

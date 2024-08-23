@@ -12,8 +12,8 @@ function App() {
 
   const logout = () => {
     client?.stop();
-    navigate("/");
     toast("Good bye 👋🏻");
+    navigate("/");
   };
 
   return (

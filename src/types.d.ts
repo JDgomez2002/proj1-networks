@@ -23,7 +23,7 @@ declare global {
     date: Date;
     from: User.id;
     unread: boolean;
-    // to: User.id;
+    to: User.id;
   }
 }
 
