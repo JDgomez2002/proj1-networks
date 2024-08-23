@@ -36,6 +36,7 @@ function Login() {
       password: password,
     });
     toast("Welcome back 🎉");
+    xmppClient.stop();
     navigate("/chat"); // Navega a la página principal después de iniciar sesión correctamente
   });
 

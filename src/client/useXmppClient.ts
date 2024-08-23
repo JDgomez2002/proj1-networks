@@ -17,19 +17,12 @@ export default function useXMPPClient() {
   const email = userStore((state) => state.user?.email);
   const password = userStore((state) => state.user?.password);
   const setStatus = userStore((state) => state.setStatus);
-  const contacts = contactsStore((state) => state.contacts);
   const setContacts = contactsStore((state) => state.setContacts);
   const updateReadStatus = contactsStore((state) => state.updateReadStatus);
-  const currentContact = contactsStore((state) => state.currentContact);
-  const messages = messagesStore((state) => state.messages);
   const newMessage = messagesStore((state) => state.newMessage);
 
   useEffect(() => {
-    console.log("currentContact:", currentContact);
-  }, [currentContact]);
-
-  useEffect(() => {
-    // if (xmppClient) return;
+    // if (xmppClientRef.current) return;
     if (!email || !password) {
       navigate("/");
       return;
@@ -147,13 +140,21 @@ export default function useXMPPClient() {
 
     // handle offline
     clientInstance.on("offline", () => {
-      // toast("Good bye 👋🏻");
-      // console.log("Offline!!!");
+      // toast("Offline 🚨");
+      console.log("Offline 🚨");
       // navigate("/");
     });
 
     return clientInstance;
   }, [email, password, setStatus, getContacts]);
+
+  // const logout = useCallback(() => {
+  //   const clientInstance = xmppClientRef.current;
+  //   if (clientInstance) {
+  //     clientInstance.stop();
+  //     navigate("/");
+  //   }
+  // }, []);
 
   return xmppClientRef.current;
 }
