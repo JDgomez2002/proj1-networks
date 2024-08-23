@@ -62,10 +62,10 @@ function Register() {
         console.log("IQ:", stanza.toString());
         if (stanza.attrs.type === "result") {
           console.log("Registration successful");
-          toast("Registration successful 🎉");
+          toast("Registered 🎉");
           setUser({ email, password });
           xmppClient.stop();
-          navigate("/chat");
+          navigate("/");
         } else {
           console.log("Registration failed");
           // toast("Registration failed 🚨");
