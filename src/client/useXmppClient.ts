@@ -108,7 +108,13 @@ export default function useXMPPClient() {
           const body = stanza.getChild("body")?.text() ?? "";
           // console.log("stanza:", stanza);
           console.log("Message from:", from, "Body:", body);
-          toast(`New message from ${from.split("@")[0]} 📬`);
+          toast(`${from.split("@")[0]} 💬`, {
+            description: body,
+            action: {
+              label: "Reply",
+              onClick: () => navigate(`/chat/${from}`),
+            },
+          });
           const message: Message = {
             id,
             from,
@@ -126,8 +132,7 @@ export default function useXMPPClient() {
           break;
         }
         case "presence": {
-          const from = stanza.attr("from");
-          const bareJid = from.split("/")[0];
+          const from = stanza.attr("from").split("/")[0];
           const type = stanza.attr("type");
 
           switch (type) {
@@ -155,18 +160,20 @@ export default function useXMPPClient() {
                 statusCases.find((item) => item.value === status)?.status ??
                 "Online";
               const contact: Contact = {
-                id: bareJid,
-                email: bareJid,
-                name: bareJid.split("@")[0],
+                id: from,
+                email: from,
+                name: from.split("@")[0],
                 status,
                 presence: presenceMessage ?? "",
               };
               const contacts = contactsStore.getState().contacts;
-              // update contact status
-              setContacts([
-                ...(contacts?.filter((c) => c.id !== bareJid) ?? []),
-                contact,
-              ]);
+              // update contact status but not added again to the contacts list
+              console.log("from:", from, "- email:", email);
+              if (from.split("@")[0] !== email)
+                setContacts([
+                  ...(contacts?.filter((c) => c.id !== from) ?? []),
+                  contact,
+                ]);
               break;
             }
           }
