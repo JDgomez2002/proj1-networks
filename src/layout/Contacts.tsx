@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Contact } from "../components";
 import contactsStore from "../stores/contacts.store";
+import userStore from "../stores/user.store";
 
 interface Props {
   logout: () => void;
@@ -8,6 +9,7 @@ interface Props {
 
 function Contacts({ logout }: Props) {
   const contacts = contactsStore((state) => state.contacts);
+  const id = userStore((state) => state.user?.id);
 
   return (
     <nav className="bg-[#12455e] border border-gray-600 w-96 h-full rounded-lg overflow-hidden">
@@ -25,11 +27,13 @@ function Contacts({ logout }: Props) {
       </section>
       <ul className="flex flex-col gap-2 py-4 px-2 overflow-y-auto h-full">
         {contacts ? (
-          contacts.map((contact, key) => (
-            <li key={key}>
-              <Contact contact={contact} />
-            </li>
-          ))
+          contacts
+            // .filter((contact) => contact.id !== id)
+            .map((contact, key) => (
+              <li key={key}>
+                <Contact contact={contact} />
+              </li>
+            ))
         ) : (
           <li>Loading...</li>
         )}

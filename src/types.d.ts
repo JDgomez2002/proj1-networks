@@ -6,12 +6,14 @@ declare global {
     password: string;
   }
 
+  type Status = "Offline" | "Online" | "Away" | "Busy" | "Not available";
+
   interface Contact {
     id: string;
     email: string;
     name?: string;
     presence?: string;
-    status?: string;
+    status?: Status;
     unread?: boolean;
   }
 

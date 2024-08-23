@@ -20,8 +20,14 @@ function Contact({ contact }: Props) {
       }`}
     >
       <h3 className="text-gray-400">{contact.email}</h3>
-      {contact?.status ? (
+      {contact?.status === "Online" ? (
         <span className="bg-green-500 text-white rounded-full h-2 w-2"></span>
+      ) : contact?.status === "Offline" ? (
+        <span className="bg-red-500 text-white rounded-full h-2 w-2"></span>
+      ) : contact?.status === "Away" ? (
+        <span className="bg-yellow-500 text-white rounded-full h-2 w-2"></span>
+      ) : contact?.status === "Busy" ? (
+        <span className="bg-orange-500 text-white rounded-full h-2 w-2"></span>
       ) : (
         <span className="bg-gray-500 text-white rounded-full h-2 w-2"></span>
       )}

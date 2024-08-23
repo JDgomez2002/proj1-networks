@@ -21,6 +21,8 @@ export default function useXMPPClient() {
   const updateReadStatus = contactsStore((state) => state.updateReadStatus);
   const newMessage = messagesStore((state) => state.newMessage);
 
+  const contacts = contactsStore((state) => state.contacts);
+
   useEffect(() => {
     // if (xmppClientRef.current) return;
     if (!email || !password) {
@@ -35,6 +37,10 @@ export default function useXMPPClient() {
     };
   }, []);
 
+  useEffect(() => {
+    console.log("Contacts:", contacts);
+  }, [contacts]);
+
   const getContacts = useCallback(
     async (xmppClientInstance: Client) => {
       if (!xmppClientInstance) return;
@@ -47,10 +53,7 @@ export default function useXMPPClient() {
         .map((item) => ({
           id: item.attr("jid") as string,
           email: (item.attr("name") || item.attr("jid")) as string,
-          name: (item.attr("name") || item.attr("jid")).replace(
-            "@alumchat.lol",
-            ""
-          ) as string,
+          name: item.attr("jid").replace("@alumchat.lol", "") as string,
         })) ?? [{ id: "test", email: "test" }];
 
       contacts.forEach((contact) => {
@@ -122,8 +125,53 @@ export default function useXMPPClient() {
           newMessage(message);
           break;
         }
-        case "presence":
+        case "presence": {
+          const from = stanza.attr("from");
+          const bareJid = from.split("/")[0];
+          const type = stanza.attr("type");
+
+          switch (type) {
+            case "suscribed": {
+              toast(`${from} accepted your request 🤝`);
+              break;
+            }
+            case "subscribe": {
+              toast(`${from} wants to be your contact 👤`);
+              break;
+            }
+            default: {
+              let status = type
+                ? type
+                : stanza.getChild("show")?.text() ?? "available";
+              const presenceMessage = stanza.getChildText("status");
+              const statusCases = [
+                { value: "unavailable", status: "Offline" },
+                { value: "available", status: "Online" },
+                { value: "away", status: "Away" },
+                { value: "dnd", status: "Busy" },
+                { value: "xa", status: "Not available" },
+              ];
+              status =
+                statusCases.find((item) => item.value === status)?.status ??
+                "Online";
+              const contact: Contact = {
+                id: bareJid,
+                email: bareJid,
+                name: bareJid.split("@")[0],
+                status,
+                presence: presenceMessage ?? "",
+              };
+              const contacts = contactsStore.getState().contacts;
+              // update contact status
+              setContacts([
+                ...(contacts?.filter((c) => c.id !== bareJid) ?? []),
+                contact,
+              ]);
+              break;
+            }
+          }
           break;
+        }
         case "iq":
           break;
         default:
