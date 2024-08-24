@@ -13,7 +13,7 @@ function Contact({ contact }: Props) {
   return (
     <Link
       to={`/chat/${contact.id}`}
-      className={`p-4 h-fit w-full border gap-1 rounded-md flex transition-colors duration-300 ease-in-out ${
+      className={`p-4 h-fit w-full border gap-1 rounded-md flex transition-all duration-300 ease-in-out hover:scale-105 ${
         id === contact.id
           ? "bg-blue-900 border-gray-400"
           : "bg-blue-950 border-gray-600"

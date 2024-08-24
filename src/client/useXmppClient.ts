@@ -19,6 +19,9 @@ export default function useXMPPClient() {
   const setStatus = userStore((state) => state.setStatus);
   const setContacts = contactsStore((state) => state.setContacts);
   const updateReadStatus = contactsStore((state) => state.updateReadStatus);
+  const setSubscribeContacts = contactsStore(
+    (state) => state.setSubscribeContacts
+  );
   const newMessage = messagesStore((state) => state.newMessage);
 
   const contacts = contactsStore((state) => state.contacts);
@@ -38,7 +41,7 @@ export default function useXMPPClient() {
   }, []);
 
   useEffect(() => {
-    console.log("Contacts:", contacts);
+    if (contacts) console.log("Contacts:", contacts);
   }, [contacts]);
 
   const getContacts = useCallback(
@@ -150,11 +153,46 @@ export default function useXMPPClient() {
 
           switch (type) {
             case "suscribed": {
-              toast(`${from} accepted your request 🤝`);
+              toast(`${from} accepted your contact request 🤝`);
               break;
             }
             case "subscribe": {
-              toast(`${from} wants to be your contact 👤`);
+              const subscribeContacts =
+                contactsStore.getState().subscribeContacts;
+              const contact: Contact = {
+                id: from,
+                email: from,
+                name: from.split("@")[0],
+              };
+
+              console.log("Subscribe contacts:", subscribeContacts);
+              console.log("Contact to subscribe:", contact);
+
+              // if the contact is already in the subscribe contacts list, don't add it again
+              if (subscribeContacts.find((c) => c.id === from)) return;
+
+              setSubscribeContacts([...(subscribeContacts ?? []), contact]);
+
+              toast(`${from} wants to be your contact 👤`, {
+                action: {
+                  label: "Accept",
+                  onClick: async () => {
+                    try {
+                      await clientInstance.send(
+                        xml("presence", { to: from, type: "subscribed" })
+                      ); // Accept the subscription
+                      await clientInstance.send(
+                        xml("presence", { to: from, type: "subscribe" })
+                      ); // Automatically subscribe back
+                      toast(`Request from ${from} accepted ✅`);
+                    } catch (e) {
+                      console.log("Error accepting contact:", e);
+                      toast("Error accepting contact 🚨");
+                    }
+                  },
+                },
+              });
+
               break;
             }
             default: {
@@ -217,7 +255,14 @@ export default function useXMPPClient() {
             }
           });
 
-          console.log("Updated contacts:", updatedContacts);
+          contacts?.forEach((contact) => {
+            // add the contact to the contacts list if it's not already there
+            if (!updatedContacts?.find((c) => c.id === contact.id)) {
+              updatedContacts?.push(contact);
+            }
+          });
+
+          // console.log("Updated contacts:", updatedContacts);
           if (updatedContacts) setContacts(updatedContacts);
 
           break;

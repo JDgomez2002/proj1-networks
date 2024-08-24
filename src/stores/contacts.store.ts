@@ -6,6 +6,8 @@ type ContactsStore = {
   currentContact: Contact | null;
   setCurrentContact: (contact: Contact) => void;
   updateReadStatus: (contactId: string, status: boolean) => void;
+  subscribeContacts: Contact[];
+  setSubscribeContacts: (contacts: Contact[]) => void;
 };
 
 const contactsStore = create<ContactsStore>((set) => ({
@@ -19,6 +21,8 @@ const contactsStore = create<ContactsStore>((set) => ({
         contact.id === contactId ? { ...contact, unread: status } : contact
       ),
     })),
+  subscribeContacts: [],
+  setSubscribeContacts: (contacts) => set({ subscribeContacts: contacts }),
 }));
 
 export default contactsStore;
