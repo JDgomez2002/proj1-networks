@@ -140,7 +140,7 @@ function Register() {
               Register
             </button>
             <Link
-              to="/register"
+              to="/"
               className="bg-gray-500 flex justify-center text-white text-center w-full py-2 rounded-md font-bold focus:scale-105 transition-transform duration-200 ease-in-out"
             >
               Login
