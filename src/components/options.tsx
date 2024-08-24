@@ -29,17 +29,22 @@ interface Props {
   logout: () => void;
   openAcceptRequestDialog: () => void;
   openSendRequestDialog: () => void;
+  updatePresenceMessageDialog: () => void;
 }
 
 export default function Options({
   logout,
   openAcceptRequestDialog,
   openSendRequestDialog,
+  updatePresenceMessageDialog,
 }: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="text-sm h-fit p-1 leading-none">
+        <Button
+          variant="outline"
+          className="text-sm h-fit p-1 leading-none hover:scale-105 transition-transform duration-300 ease-in-out"
+        >
           <Settings className="h-7 w-7" />
         </Button>
       </DropdownMenuTrigger>
@@ -52,7 +57,6 @@ export default function Options({
             <span>Contact requests</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={openSendRequestDialog}>
-            {/* <Plus className="mr-2 h-4 w-4" /> */}
             <UserPlus className="mr-2 h-4 w-4" />
             <span>Add contact</span>
           </DropdownMenuItem>
@@ -77,7 +81,7 @@ export default function Options({
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={updatePresenceMessageDialog}>
             <Plus className="mr-2 h-4 w-4" />
             <span>Presence message</span>
           </DropdownMenuItem>

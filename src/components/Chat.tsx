@@ -12,7 +12,7 @@ import ContactInfo from "./ContactInfo";
 function Chat() {
   const { id } = useParams();
 
-  const client = useXMPPClient();
+  const { client } = useXMPPClient();
 
   const messagesContainerRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);

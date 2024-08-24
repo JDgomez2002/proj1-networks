@@ -5,19 +5,31 @@ import contactsStore from "../stores/contacts.store";
 import AcceptRequest from "../components/AcceptRequest";
 import Options from "../components/options";
 import SendRequest from "../components/SendRequest";
+import UpdatePresence from "../components/UpdatePresence";
 
 interface Props {
   logout: () => void;
   acceptRequest: (contactId: string) => void;
   sendRequest: (jid: string, closer: Dispatch<SetStateAction<boolean>>) => void;
+  updatePresenceMessage: (
+    message: string,
+    closer: Dispatch<SetStateAction<boolean>>
+  ) => void;
 }
 
-function Contacts({ logout, acceptRequest, sendRequest }: Props) {
+function Contacts({
+  logout,
+  acceptRequest,
+  sendRequest,
+  updatePresenceMessage,
+}: Props) {
   const contacts = contactsStore((state) => state.contacts);
 
   const [acceptRequestDialog, setAcceptRequestDialog] =
     useState<boolean>(false);
   const [sendRequestDialog, setSendRequestDialog] = useState<boolean>(false);
+  const [updatePresenceMessageDialog, setUpdatePresenceMessageDialog] =
+    useState<boolean>(false);
 
   return (
     <nav className="bg-[#12455e] border border-gray-600 w-96 h-full rounded-lg overflow-hidden">
@@ -29,6 +41,9 @@ function Contacts({ logout, acceptRequest, sendRequest }: Props) {
           logout={logout}
           openAcceptRequestDialog={() => setAcceptRequestDialog(true)}
           openSendRequestDialog={() => setSendRequestDialog(true)}
+          updatePresenceMessageDialog={() =>
+            setUpdatePresenceMessageDialog(true)
+          }
         />
       </section>
       <ul className="flex flex-col gap-2 py-4 px-2 overflow-y-auto h-full">
@@ -73,6 +88,12 @@ function Contacts({ logout, acceptRequest, sendRequest }: Props) {
         open={sendRequestDialog}
         closer={setSendRequestDialog}
         sendRequest={sendRequest}
+      />
+
+      <UpdatePresence
+        open={updatePresenceMessageDialog}
+        closer={setUpdatePresenceMessageDialog}
+        updatePresenceMessage={updatePresenceMessage}
       />
     </nav>
   );

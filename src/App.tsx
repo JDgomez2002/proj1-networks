@@ -10,7 +10,7 @@ import contactsStore from "./stores/contacts.store";
 
 function App() {
   const navigate = useNavigate();
-  const client = useXMPPClient();
+  const { client } = useXMPPClient();
 
   const contacts = contactsStore((state) => state.contacts);
   const setContacts = contactsStore((state) => state.setContacts);
@@ -69,12 +69,27 @@ function App() {
     }
   };
 
+  const updatePresenceMessage = async (
+    message: string,
+    closer: Dispatch<SetStateAction<boolean>>
+  ) => {
+    try {
+      await client?.send(xml("presence", {}, xml("status", {}, message)));
+      toast("Presence message updated ✨");
+      closer(false);
+    } catch (error) {
+      console.error("Error updating presence message:", error);
+      toast("Error updating presence message 🚨");
+    }
+  };
+
   return (
     <article className="h-dvh w-full bg-gray-950 gap-4 flex flex-row p-4">
       <Contacts
         logout={logout}
         acceptRequest={acceptRequest}
         sendRequest={sendRequest}
+        updatePresenceMessage={updatePresenceMessage}
       />
       <main className="bg-[#12455e] border border-gray-600 h-full w-full rounded-lg overflow-hidden">
         <Outlet />

@@ -24,8 +24,6 @@ export default function useXMPPClient() {
   );
   const newMessage = messagesStore((state) => state.newMessage);
 
-  const contacts = contactsStore((state) => state.contacts);
-
   useEffect(() => {
     // if (xmppClientRef.current) return;
     if (!email || !password) {
@@ -39,10 +37,6 @@ export default function useXMPPClient() {
       clientInstance.stop();
     };
   }, []);
-
-  useEffect(() => {
-    if (contacts) console.log("Contacts:", contacts);
-  }, [contacts]);
 
   const getContacts = useCallback(
     async (xmppClientInstance: Client) => {
@@ -297,5 +291,5 @@ export default function useXMPPClient() {
   //   }
   // }, []);
 
-  return xmppClientRef.current;
+  return { client: xmppClientRef.current, getContacts };
 }
