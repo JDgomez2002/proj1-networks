@@ -20,7 +20,7 @@ export default function ContactInfo({ open, closer, contact }: Props) {
         <DialogHeader>
           <DialogTitle className="text-3xl">{contact.email}</DialogTitle>
           <DialogDescription className="flex gap-1 text-lg">
-            {contact.status}{" "}
+            {contact.status ?? "Can't watch status"}{" "}
             {contact.status === "Online" ? (
               <span className="bg-green-500 rounded-full h-3 w-3 flex my-auto"></span>
             ) : contact?.status === "Offline" ? (

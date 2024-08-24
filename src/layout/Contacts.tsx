@@ -25,11 +25,31 @@ function Contacts({ logout }: Props) {
       </section>
       <ul className="flex flex-col gap-2 py-4 px-2 overflow-y-auto h-full">
         {contacts ? (
-          contacts.map((contact, key) => (
-            <li key={key}>
-              <Contact contact={contact} />
-            </li>
-          ))
+          contacts
+            // sort by name property & status in order: "Offline" | "Online" | "Away" | "Busy" | "Not available"
+            // priority status order: Offline > Online > Away > Busy > Not available
+            // if status is the same, sort by name property
+            .sort((a, b) => {
+              if (a.status === b.status) {
+                return (a.name ?? "").localeCompare(b.name ?? "");
+              }
+              const statusOrder = [
+                "Offline",
+                "Online",
+                "Away",
+                "Busy",
+                "Not available",
+              ];
+              return (
+                statusOrder.indexOf(a.status ?? "Not available") -
+                statusOrder.indexOf(b.status ?? "Not available")
+              );
+            })
+            .map((contact, key) => (
+              <li key={key}>
+                <Contact contact={contact} />
+              </li>
+            ))
         ) : (
           <li>Loading...</li>
         )}
