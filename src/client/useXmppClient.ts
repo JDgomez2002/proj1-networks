@@ -108,13 +108,8 @@ export default function useXMPPClient() {
           const body = stanza.getChild("body")?.text() ?? "";
           // console.log("stanza:", stanza);
           // console.log("Message from:", from, "Body:", body);
-          toast(`${from.split("@")[0]} 💬`, {
-            description: body,
-            action: {
-              label: "Reply",
-              onClick: () => navigate(`/chat/${from}`),
-            },
-          });
+
+          const messages = messagesStore.getState().messages;
           const message: Message = {
             id,
             from,
@@ -123,13 +118,22 @@ export default function useXMPPClient() {
             date: new Date(),
             unread: false,
           };
-          const currentContact = contactsStore.getState().currentContact;
-          if (currentContact?.email !== from) {
-            message.unread = true;
-            updateReadStatus(from, true);
+          // add the message to messages store, just if the message is not already in the messages list
+          if (!messages.find((m) => m.id === message.id)) {
+            const currentContact = contactsStore.getState().currentContact;
+            if (currentContact?.email !== from) {
+              message.unread = true;
+              updateReadStatus(from, true);
+            }
+            newMessage(message);
+            toast(`${from.split("@")[0]} 💬`, {
+              description: body,
+              action: {
+                label: "Reply",
+                onClick: () => navigate(`/chat/${from}`),
+              },
+            });
           }
-          // contact the message to messages store
-          newMessage(message);
           break;
         }
         case "presence": {
