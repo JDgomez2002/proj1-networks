@@ -15,6 +15,7 @@ declare global {
     presence?: string;
     status?: Status;
     unread?: boolean;
+    subscription?: string;
   }
 
   interface Message {

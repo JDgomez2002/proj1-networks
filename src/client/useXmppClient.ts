@@ -87,6 +87,14 @@ export default function useXMPPClient() {
       await getContacts(clientInstance);
       // send presence
       await clientInstance.send(xml("presence"));
+      // request iq roaster
+      await clientInstance.send(
+        xml(
+          "iq",
+          { type: "get", id: "roster_1" },
+          xml("query", { xmlns: "jabber:iq:roster" })
+        )
+      );
     });
 
     // handle stanzas
@@ -124,15 +132,15 @@ export default function useXMPPClient() {
             if (currentContact?.email !== from) {
               message.unread = true;
               updateReadStatus(from, true);
+              toast(`${from.split("@")[0]} 💬`, {
+                description: body,
+                action: {
+                  label: "Reply",
+                  onClick: () => navigate(`/chat/${from}`),
+                },
+              });
             }
             newMessage(message);
-            toast(`${from.split("@")[0]} 💬`, {
-              description: body,
-              action: {
-                label: "Reply",
-                onClick: () => navigate(`/chat/${from}`),
-              },
-            });
           }
           break;
         }
@@ -183,8 +191,37 @@ export default function useXMPPClient() {
           }
           break;
         }
-        case "iq":
+        case "iq": {
+          const items = stanza
+            ?.getChild("query", "jabber:iq:roster")
+            ?.getChildren("item");
+          const contacts = contactsStore.getState().contacts;
+          const updatedContacts = items?.map((item) => {
+            const jid = item.attrs.jid.split("/")[0];
+            const subscription = item.attrs.subscription;
+            const contact: Contact | undefined = contacts?.find(
+              (c) => c.id === jid
+            );
+
+            if (!contact) {
+              const newContact: Contact = {
+                id: jid,
+                email: jid,
+                name: jid.split("@")[0],
+                subscription,
+              };
+              return newContact;
+            } else {
+              contact.subscription = subscription;
+              return contact;
+            }
+          });
+
+          console.log("Updated contacts:", updatedContacts);
+          if (updatedContacts) setContacts(updatedContacts);
+
           break;
+        }
         default:
           console.log("Unknown stanza type");
           break;

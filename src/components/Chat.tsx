@@ -7,6 +7,7 @@ import messagesStore from "../stores/messages.store";
 import useXMPPClient from "../client/useXmppClient";
 import { xml } from "@xmpp/client";
 import { toast } from "sonner";
+import ContactInfo from "./ContactInfo";
 
 function Chat() {
   const { id } = useParams();
@@ -25,6 +26,8 @@ function Chat() {
   const currentContact = contactsStore((state) => state.currentContact);
   const setCurrentContact = contactsStore((state) => state.setCurrentContact);
   const updateReadStatus = contactsStore((state) => state.updateReadStatus);
+
+  const [contactInfoDialog, setContactInfoDialog] = useState<boolean>(false);
 
   useEffect(() => {
     const contact = contacts?.find((contact) => contact.id === id);
@@ -71,7 +74,7 @@ function Chat() {
         )
       );
 
-      toast("Message sent 🚀");
+      // toast("Message sent 🚀");
       inputRef.current!.value = "";
       inputRef.current!.focus();
     } catch (e) {
@@ -92,11 +95,15 @@ function Chat() {
 
   return (
     <article className="h-full overflow-hidden flex flex-col">
-      <div className="bg-[#00798c] px-4 py-4">
+      <button
+        type="button"
+        onClick={() => setContactInfoDialog(true)}
+        className="bg-[#00798c] px-4 py-4"
+      >
         <h1 className="text-3xl text-gray-300 font-semibold">
           {currentContact.name}
         </h1>
-      </div>
+      </button>
       <section
         ref={messagesContainerRef}
         className="overflow-y-auto flex flex-col flex-1"
@@ -136,6 +143,12 @@ function Chat() {
           Send
         </button>
       </form>
+
+      <ContactInfo
+        open={contactInfoDialog}
+        closer={setContactInfoDialog}
+        contact={currentContact}
+      />
     </article>
   );
 }
