@@ -29,7 +29,7 @@ export default function AcceptRequest({ open, closer, acceptRequest }: Props) {
     <Dialog open={open} onOpenChange={closer}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-3xl">Accept request</DialogTitle>
+          <DialogTitle className="text-3xl">Contact requests</DialogTitle>
           <DialogDescription className="flex gap-1 text-lg">
             Accept any request from users below
           </DialogDescription>
