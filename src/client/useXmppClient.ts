@@ -396,6 +396,90 @@ export default function useXMPPClient() {
     }
   };
 
+  const getFileSlot = async (file: File) => {
+    const client = xmppClientRef.current;
+    const slotRequest = xml(
+      "iq",
+      { type: "get", to: "httpfileupload.alumchat.lol" },
+      xml(
+        "request",
+        { xmlns: "urn:xmpp:http:upload:0" },
+        xml("filename", {}, file.name),
+        xml("size", {}, file.size.toString()),
+        xml("content-type", {}, file.type)
+      )
+    );
+
+    const result = await client?.iqCaller.request(slotRequest);
+    const slot = result?.getChild("slot", "urn:xmpp:http:upload:0");
+    if (!slot) throw new Error("No slot received from server");
+
+    const putUrl = slot.getChild("put")?.attrs.url;
+    const getUrl = slot.getChild("get")?.attrs.url;
+    if (!putUrl || !getUrl) throw new Error("Invalid slot information");
+
+    return { uploadUrl: putUrl, downloadUrl: getUrl };
+  };
+
+  const sendFile = async (file: File) => {
+    try {
+      const { uploadUrl, downloadUrl } = await getFileSlot(file);
+      await fetch(uploadUrl, {
+        method: "PUT",
+        body: file,
+        headers: {
+          "Content-Type": file.type,
+          "Content-Length": file.size.toString(),
+        },
+      });
+
+      await sendMessage(downloadUrl);
+
+      toast("File uploaded 📤");
+    } catch (e) {
+      console.error("Error uploading file:", e);
+      toast("Error uploading file 🚨");
+    }
+  };
+
+  const sendMessage = async (message: string) => {
+    const client = xmppClientRef.current;
+    if (!client) return;
+    if (!message.trim()) return;
+
+    const currentContact = contactsStore.getState().currentContact;
+
+    try {
+      await client.send(
+        xml(
+          "message",
+          { type: "chat", to: currentContact?.id },
+          xml("body", {}, message)
+        )
+      );
+
+      // verify if the message is already in the messages list
+      const messages = messagesStore.getState().messages;
+      if (!messages.find((m) => m.content === message)) {
+        newMessage({
+          id: `uid-from-${
+            currentContact?.id
+          }-to-${email}-${new Date().getTime()}`,
+          from: email,
+          to: currentContact?.email,
+          content: message,
+          date: new Date(),
+          unread: false,
+        });
+      }
+    } catch (e) {
+      toast("Error sending message 🚨", {
+        action: { label: "Try again", onClick: () => sendMessage },
+      });
+      console.log("Error sending message:", e);
+    }
+  };
+
   return {
     client: xmppClientRef.current,
     logout,
@@ -403,5 +487,7 @@ export default function useXMPPClient() {
     sendRequest,
     updatePresenceMessage,
     deleteAccount,
+    sendFile,
+    sendMessage,
   };
 }
