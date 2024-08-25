@@ -18,6 +18,7 @@ export default function useXMPPClient() {
   const password = userStore((state) => state.user?.password);
   const setStatus = userStore((state) => state.setStatus);
   const setContacts = contactsStore((state) => state.setContacts);
+  const setCurrentContact = contactsStore((state) => state.setCurrentContact);
   const updateReadStatus = contactsStore((state) => state.updateReadStatus);
   const setSubscribeContacts = contactsStore(
     (state) => state.setSubscribeContacts
@@ -178,7 +179,27 @@ export default function useXMPPClient() {
                       await clientInstance.send(
                         xml("presence", { to: from, type: "subscribe" })
                       ); // Automatically subscribe back
+                      const subscribeContacts =
+                        contactsStore.getState().subscribeContacts;
+                      setSubscribeContacts(
+                        subscribeContacts.filter((c) => c.id !== from)
+                      );
+                      const contacts = contactsStore.getState().contacts ?? [];
+                      setSubscribeContacts(
+                        contacts.filter((c) => c.id !== from)
+                      );
+
+                      // add the contact to the contacts list
+                      const contact: Contact = {
+                        id: from,
+                        email: from,
+                        name: from.split("@")[0],
+                      };
+                      setContacts([...(contacts ?? []), contact]);
+
                       toast(`Request from ${from} accepted ✅`);
+                      // navigate to the chat page
+                      navigate("/chat/" + from);
                     } catch (e) {
                       console.log("Error accepting contact:", e);
                       toast("Error accepting contact 🚨");
@@ -268,10 +289,9 @@ export default function useXMPPClient() {
     });
 
     // handle errors
-    // clientInstance.on("error", (e) => {
-    //   // console.log("XMPP Error:", e);
-    //   // toast("Can't connect to XMPP server 🚨");
-    // });
+    clientInstance.on("error", () => {
+      // console.log("connection", e.message.slice(0, 1));
+    });
 
     // handle offline
     clientInstance.on("offline", () => {
@@ -283,13 +303,105 @@ export default function useXMPPClient() {
     return clientInstance;
   }, [email, password, setStatus, getContacts]);
 
-  // const logout = useCallback(() => {
-  //   const clientInstance = xmppClientRef.current;
-  //   if (clientInstance) {
-  //     clientInstance.stop();
-  //     navigate("/");
-  //   }
-  // }, []);
+  const logout = () => {
+    const client = xmppClientRef.current;
+    client?.stop();
+    toast("Good bye 👋🏻");
+    navigate("/");
+  };
 
-  return { client: xmppClientRef.current, getContacts };
+  const acceptRequest = async (contactId: string) => {
+    try {
+      const client = xmppClientRef.current;
+      await client?.send(
+        xml("presence", { to: contactId, type: "subscribed" })
+      ); // Accept the subscription
+      await client?.send(xml("presence", { to: contactId, type: "subscribe" })); // Automatically subscribe back
+      const subscribeContacts = contactsStore.getState().subscribeContacts;
+      setSubscribeContacts(subscribeContacts.filter((c) => c.id !== contactId));
+      const contacts = contactsStore.getState().contacts ?? [];
+      setSubscribeContacts(contacts.filter((c) => c.id !== contactId));
+
+      // add the contact to the contacts list
+      const contact: Contact = {
+        id: contactId,
+        email: contactId,
+        name: contactId.split("@")[0],
+      };
+      setContacts([...(contacts ?? []), contact]);
+
+      toast(`Request from ${contactId} accepted ✅`);
+      // navigate to the chat page
+      navigate("/chat/" + contactId);
+    } catch (e) {
+      console.log("Error accepting contact:", e);
+      toast("Error accepting contact 🚨");
+    }
+  };
+
+  const sendRequest = async (jid: string) => {
+    if (!jid || !jid.includes("@alumchat.lol")) {
+      toast("Please enter a valid JID 🚨", {
+        description: "example@alumchat.lol",
+      });
+      return;
+    }
+    const client = xmppClientRef.current;
+
+    try {
+      await client?.send(xml("presence", { to: jid, type: "subscribe" }));
+      const contact: Contact = {
+        id: jid,
+        email: jid,
+        name: jid.split("@")[0],
+      };
+      const contacts = contactsStore.getState().contacts;
+      setContacts([...(contacts ?? []), contact]);
+      setCurrentContact(contact);
+      toast(`Request sent to ${jid} ✨`);
+      navigate("/chat/" + jid);
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+      toast("Error sending friend request 🚨");
+    }
+  };
+
+  const updatePresenceMessage = async (message: string) => {
+    const client = xmppClientRef.current;
+    try {
+      await client?.send(xml("presence", {}, xml("status", {}, message)));
+      toast("Presence message updated ✨");
+    } catch (error) {
+      console.error("Error updating presence message:", error);
+      toast("Error updating presence message 🚨");
+    }
+  };
+
+  const deleteAccount = async () => {
+    const client = xmppClientRef.current;
+    try {
+      await client?.iqCaller.request(
+        xml(
+          "iq",
+          { type: "set" },
+          xml("query", { xmlns: "jabber:iq:register" }, xml("remove"))
+        )
+      );
+      client?.stop();
+      toast("Account deleted 💔");
+      navigate("/");
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast("Error deleting account 🚨");
+    }
+  };
+
+  return {
+    client: xmppClientRef.current,
+    logout,
+    acceptRequest,
+    sendRequest,
+    updatePresenceMessage,
+    deleteAccount,
+  };
 }

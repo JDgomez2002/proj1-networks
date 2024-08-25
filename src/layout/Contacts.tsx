@@ -6,6 +6,7 @@ import AcceptRequest from "../components/AcceptRequest";
 import Options from "../components/options";
 import SendRequest from "../components/SendRequest";
 import UpdatePresence from "../components/UpdatePresence";
+import DeleteAccount from "../components/DeleteAccount";
 
 interface Props {
   logout: () => void;
@@ -15,6 +16,7 @@ interface Props {
     message: string,
     closer: Dispatch<SetStateAction<boolean>>
   ) => void;
+  deleteAccount: () => Promise<void>;
 }
 
 function Contacts({
@@ -22,6 +24,7 @@ function Contacts({
   acceptRequest,
   sendRequest,
   updatePresenceMessage,
+  deleteAccount,
 }: Props) {
   const contacts = contactsStore((state) => state.contacts);
 
@@ -29,6 +32,8 @@ function Contacts({
     useState<boolean>(false);
   const [sendRequestDialog, setSendRequestDialog] = useState<boolean>(false);
   const [updatePresenceMessageDialog, setUpdatePresenceMessageDialog] =
+    useState<boolean>(false);
+  const [deleteAccountDialog, setDeleteAccountDialog] =
     useState<boolean>(false);
 
   return (
@@ -44,6 +49,7 @@ function Contacts({
           updatePresenceMessageDialog={() =>
             setUpdatePresenceMessageDialog(true)
           }
+          deleteAccountDialog={() => setDeleteAccountDialog(true)}
         />
       </section>
       <ul className="flex flex-col gap-2 py-4 px-2 overflow-y-auto h-full">
@@ -94,6 +100,12 @@ function Contacts({
         open={updatePresenceMessageDialog}
         closer={setUpdatePresenceMessageDialog}
         updatePresenceMessage={updatePresenceMessage}
+      />
+
+      <DeleteAccount
+        open={deleteAccountDialog}
+        closer={setDeleteAccountDialog}
+        deleteAccount={deleteAccount}
       />
     </nav>
   );

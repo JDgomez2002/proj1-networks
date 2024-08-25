@@ -30,6 +30,7 @@ interface Props {
   openAcceptRequestDialog: () => void;
   openSendRequestDialog: () => void;
   updatePresenceMessageDialog: () => void;
+  deleteAccountDialog: () => void;
 }
 
 export default function Options({
@@ -37,6 +38,7 @@ export default function Options({
   openAcceptRequestDialog,
   openSendRequestDialog,
   updatePresenceMessageDialog,
+  deleteAccountDialog,
 }: Props) {
   return (
     <DropdownMenu>
@@ -85,7 +87,7 @@ export default function Options({
             <Plus className="mr-2 h-4 w-4" />
             <span>Presence message</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={deleteAccountDialog}>
             <Trash className="mr-2 h-4 w-4" />
             <span>Delete account</span>
           </DropdownMenuItem>

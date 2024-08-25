@@ -24,9 +24,9 @@ function Login() {
     password,
   });
 
-  // xmppClient.on("error", (e) => {
-  //   console.log("XMPP LOGIN Error:", e);
-  // });
+  xmppClient.on("error", () => {
+    // console.log("connection", e.message.slice(0, 1));
+  });
 
   xmppClient.on("online", (address) => {
     console.log("Logged in as:", address.local);
@@ -45,9 +45,9 @@ function Login() {
     try {
       await xmppClient.start();
     } catch (e) {
-      console.log("Error loging in:", e);
+      console.log("Error logging in:", e);
       toast("Can't sign in right now 🚨", {
-        description: "Error loging in",
+        description: "Error logging in",
       });
     }
   };
