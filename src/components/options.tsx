@@ -31,6 +31,7 @@ interface Props {
   openSendRequestDialog: () => void;
   updatePresenceMessageDialog: () => void;
   deleteAccountDialog: () => void;
+  joinGroupDialog: () => void;
 }
 
 export default function Options({
@@ -39,6 +40,7 @@ export default function Options({
   openSendRequestDialog,
   updatePresenceMessageDialog,
   deleteAccountDialog,
+  joinGroupDialog,
 }: Props) {
   return (
     <DropdownMenu>
@@ -69,7 +71,7 @@ export default function Options({
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={joinGroupDialog}>
                   <MessageCircle className="mr-2 h-4 w-4" />
                   <span>Join group</span>
                 </DropdownMenuItem>

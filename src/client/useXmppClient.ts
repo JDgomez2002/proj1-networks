@@ -183,8 +183,8 @@ export default function useXMPPClient() {
                 name: from.split("@")[0],
               };
 
-              console.log("Subscribe contacts:", subscribeContacts);
-              console.log("Contact to subscribe:", contact);
+              // console.log("Subscribe contacts:", subscribeContacts);
+              // console.log("Contact to subscribe:", contact);
 
               // if the contact is already in the subscribe contacts list, don't add it again
               if (subscribeContacts.find((c) => c.id === from)) return;

@@ -8,6 +8,7 @@ import Options from "../components/options";
 import SendRequest from "../components/SendRequest";
 import UpdatePresence from "../components/UpdatePresence";
 import DeleteAccount from "../components/DeleteAccount";
+import JoinGroup from "../components/JoinGroup";
 import { Avatar, AvatarFallback } from "../components/ui/avatar";
 
 interface Props {
@@ -39,6 +40,7 @@ function Contacts({
     useState<boolean>(false);
   const [deleteAccountDialog, setDeleteAccountDialog] =
     useState<boolean>(false);
+  const [joinGroupDialog, setJoinGroupDialog] = useState<boolean>(false);
 
   return (
     <nav className="bg-[#12455e] border border-gray-600 w-96 h-full rounded-lg overflow-hidden">
@@ -54,6 +56,7 @@ function Contacts({
             setUpdatePresenceMessageDialog(true)
           }
           deleteAccountDialog={() => setDeleteAccountDialog(true)}
+          joinGroupDialog={() => setJoinGroupDialog(true)}
         />
       </section>
       <ul className="flex flex-col gap-2 py-4 px-2 pb-36 overflow-y-auto h-full">
@@ -130,6 +133,12 @@ function Contacts({
         open={deleteAccountDialog}
         closer={setDeleteAccountDialog}
         deleteAccount={deleteAccount}
+      />
+
+      <JoinGroup
+        open={joinGroupDialog}
+        closer={setJoinGroupDialog}
+        joinGroup={undefined}
       />
     </nav>
   );
