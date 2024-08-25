@@ -33,6 +33,7 @@ function Login() {
     // Guardar en sessionStorage
     setUser({
       email: address.local,
+      name: address.local.split("@")[0],
       password: password,
     });
     toast("Welcome back 🎉");

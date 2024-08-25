@@ -26,6 +26,14 @@ declare global {
     unread: boolean;
     to: User.id;
   }
+
+  interface Group {
+    id: string;
+    name: string;
+    members: string[];
+    messages: Message[];
+    isPublic: boolean;
+  }
 }
 
 export {};

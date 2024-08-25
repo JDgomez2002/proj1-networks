@@ -3,7 +3,6 @@ import { Dispatch, SetStateAction } from "react";
 import { Contacts } from "./layout";
 import { Outlet } from "react-router-dom";
 import { toast } from "sonner";
-// import { xml } from "@xmpp/client";
 import useXMPPClient from "./client/useXmppClient";
 
 function App() {

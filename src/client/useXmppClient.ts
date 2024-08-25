@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import userStore from "../stores/user.store";
 import contactsStore from "../stores/contacts.store";
 import messagesStore from "../stores/messages.store";
+import groupsStore from "../stores/groups.store";
 import { toast } from "sonner";
 
 const XMPP_SERVICE = "ws://alumchat.lol:7070/ws/";
@@ -24,6 +25,7 @@ export default function useXMPPClient() {
     (state) => state.setSubscribeContacts
   );
   const newMessage = messagesStore((state) => state.newMessage);
+  const setGroups = groupsStore((state) => state.setGroups);
 
   useEffect(() => {
     // if (xmppClientRef.current) return;
@@ -79,7 +81,7 @@ export default function useXMPPClient() {
     clientInstance.on("online", async (address) => {
       console.log("Connected as:", address.local);
       // toast("Welcome back 🎉");
-      setStatus("online");
+      setStatus("Online");
 
       // get contacts
       await getContacts(clientInstance);
@@ -93,6 +95,27 @@ export default function useXMPPClient() {
           xml("query", { xmlns: "jabber:iq:roster" })
         )
       );
+
+      const response = await xmppClientRef.current?.iqCaller.request(
+        xml(
+          "iq",
+          { type: "get", to: `conference.${XMPP_DOMAIN}` },
+          xml("query", {
+            xmlns: "http://jabber.org/protocol/disco#items",
+          })
+        )
+      );
+
+      const items = response?.getChild("query")?.getChildren("item") ?? [];
+      const publicGroups: Group[] = items.map((item) => ({
+        id: item.attrs.jid,
+        name: item.attrs.name ?? item.attrs.jid.split("@")[0],
+        members: [],
+        messages: [],
+        isPublic: true,
+      }));
+
+      setGroups(publicGroups);
     });
 
     // handle stanzas
