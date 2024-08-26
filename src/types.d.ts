@@ -25,6 +25,7 @@ declare global {
     from: User.id;
     unread: boolean;
     to: User.id;
+    isGroup: boolean;
   }
 
   interface Group {

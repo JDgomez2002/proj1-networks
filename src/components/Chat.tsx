@@ -13,7 +13,7 @@ import SelectChat from "./SelectChat";
 interface Props {
   id: string | undefined;
   sendMessage: (message: string, to?: string) => Promise<void>;
-  sendFile: (file: File, to?: string) => Promise<void>;
+  sendFile: (file: File, groupJid?: string) => Promise<void>;
 }
 
 function Chat({ id, sendMessage, sendFile }: Props) {
@@ -96,8 +96,10 @@ function Chat({ id, sendMessage, sendFile }: Props) {
             messages
               .filter(
                 (message) =>
-                  currentContact.email === message.from ||
-                  currentContact.email === message.to
+                  // currentContact.email === message.from ||
+                  // currentContact.email === message.to
+                  message.to.includes(currentContact.email) ||
+                  message.from.includes(currentContact.email)
               )
               // order by date property newest at the bottom
               .sort((a, b) => a.date.getTime() - b.date.getTime())

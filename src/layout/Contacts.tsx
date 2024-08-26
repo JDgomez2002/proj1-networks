@@ -10,6 +10,7 @@ import UpdatePresence from "../components/UpdatePresence";
 import DeleteAccount from "../components/DeleteAccount";
 import JoinGroup from "../components/JoinGroup";
 import { Avatar, AvatarFallback } from "../components/ui/avatar";
+import CreateGroup from "../components/CreateGroup";
 
 interface Props {
   logout: () => void;
@@ -25,6 +26,7 @@ interface Props {
     nickname: string,
     password?: string
   ) => Promise<void>;
+  createGroup: (groupName: string) => Promise<void>;
 }
 
 function Contacts({
@@ -34,6 +36,7 @@ function Contacts({
   updatePresenceMessage,
   deleteAccount,
   joinGroup,
+  createGroup,
 }: Props) {
   const contacts = contactsStore((state) => state.contacts);
   const name = userStore((state) => state.user?.name);
@@ -47,6 +50,7 @@ function Contacts({
   const [deleteAccountDialog, setDeleteAccountDialog] =
     useState<boolean>(false);
   const [joinGroupDialog, setJoinGroupDialog] = useState<boolean>(false);
+  const [createGroupDialog, setCreateGroupDialog] = useState<boolean>(false);
 
   return (
     <nav className="bg-[#12455e] border border-gray-600 w-96 h-full rounded-lg overflow-hidden">
@@ -63,6 +67,7 @@ function Contacts({
           }
           deleteAccountDialog={() => setDeleteAccountDialog(true)}
           joinGroupDialog={() => setJoinGroupDialog(true)}
+          createGroupDialog={() => setCreateGroupDialog(true)}
         />
       </section>
       <ul className="flex flex-col gap-2 py-4 px-2 pb-36 overflow-y-auto h-full">
@@ -145,6 +150,12 @@ function Contacts({
         open={joinGroupDialog}
         closer={setJoinGroupDialog}
         joinGroup={joinGroup}
+      />
+
+      <CreateGroup
+        open={createGroupDialog}
+        closer={setCreateGroupDialog}
+        createGroup={createGroup}
       />
     </nav>
   );

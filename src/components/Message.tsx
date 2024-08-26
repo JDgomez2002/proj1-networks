@@ -1,4 +1,5 @@
 import contactsStore from "../stores/contacts.store";
+import groupsStore from "../stores/groups.store";
 
 const images = [".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp"];
 
@@ -33,10 +34,18 @@ function Message({ message }: Props) {
     message.content
   );
 
+  const groups = groupsStore((state) => state.groups);
+
   return (
     <article
       className={`py-2 px-4 rounded-md w-fit max-w-96 ${
-        message.from === currentContact?.email
+        // if it exits on groups, remove the domain example@conference.alumchat.lol & evaluate the example@conference.alumchat.lol/nickname to verify if its a message from user or from another user
+        message.from.includes("@conference.alumchat.lol")
+          ? message.from.split("/")[1] !==
+            groups.find((g) => g.id === currentContact?.id)?.nickname
+            ? "ml-0 bg-gray-800"
+            : "ml-auto bg-blue-950"
+          : message.from.includes(currentContact?.email)
           ? "ml-0 bg-gray-800"
           : "ml-auto bg-blue-950"
       }`}

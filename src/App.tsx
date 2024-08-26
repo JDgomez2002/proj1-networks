@@ -16,6 +16,7 @@ function App() {
     joinGroup,
     sendMessage,
     sendFile,
+    createGroup,
   } = useXMPPClient();
 
   const currentContactId = contactsStore((state) => state.currentContact?.id);
@@ -64,6 +65,7 @@ function App() {
         updatePresenceMessage={handleUpdatePresenceMessage}
         deleteAccount={deleteAccount}
         joinGroup={joinGroup}
+        createGroup={createGroup}
       />
       <main className="bg-[#12455e] border border-gray-600 h-full w-full rounded-lg overflow-hidden">
         <Chat

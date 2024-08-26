@@ -133,25 +133,26 @@ export default function useXMPPClient() {
         case "message": {
           if (stanza.getChild("body") === undefined) break;
           const id = stanza.attr("id");
-          const from = stanza.attr("from").split("/")[0];
+          const from = stanza.attr("from");
           const body = stanza.getChild("body")?.text() ?? "";
           // console.log("stanza:", stanza);
-          // console.log("Message from:", from, "Body:", body);
+          console.log("Message from:", from, "Body:", body);
 
           const messages = messagesStore.getState().messages;
           const message: Message = {
             id,
-            from,
+            from: from.includes("@conference") ? from : from.split("/")[0],
             to: email,
             content: body,
             date: new Date(),
             unread: false,
+            isGroup: from.includes("@conference"),
           };
-          console.log("new Message:", message);
+          // console.log("new Message:", message);
           // add the message to messages store, just if the message is not already in the messages list
           if (!messages.find((m) => m.id === message.id)) {
             const currentContact = contactsStore.getState().currentContact;
-            if (currentContact?.email !== from) {
+            if (currentContact?.email !== from.split("/")[0]) {
               message.unread = true;
               updateReadStatus(from, true);
               toast(`${from.split("@")[0]} 💬`, {
@@ -445,7 +446,7 @@ export default function useXMPPClient() {
     return { uploadUrl: putUrl, downloadUrl: getUrl };
   };
 
-  const sendFile = async (file: File) => {
+  const sendFile = async (file: File, groupJid?: string) => {
     try {
       const { uploadUrl, downloadUrl } = await getFileSlot(file);
       await fetch(uploadUrl, {
@@ -457,7 +458,7 @@ export default function useXMPPClient() {
         },
       });
 
-      await sendMessage(downloadUrl);
+      await sendMessage(downloadUrl, groupJid);
 
       toast("File uploaded 📤");
     } catch (e) {
@@ -472,7 +473,6 @@ export default function useXMPPClient() {
     if (!message.trim()) return;
 
     const currentContact = contactsStore.getState().currentContact;
-    console.log("Sending message to:", currentContact?.id);
 
     try {
       const msg = xml(
@@ -486,24 +486,25 @@ export default function useXMPPClient() {
       );
       await client.send(msg);
 
-      console.log("Message sent:", msg.toString());
+      // console.log("Message sent:", msg.toString());
 
       if (groupJid) return;
 
       // verify if the message is already in the messages list
-      const messages = messagesStore.getState().messages;
-      if (!messages.find((m) => m.content === message)) {
-        newMessage({
-          id: `uid-from-${
-            currentContact?.id
-          }-to-${email}-${new Date().getTime()}`,
-          from: email,
-          to: currentContact?.email,
-          content: message,
-          date: new Date(),
-          unread: false,
-        });
-      }
+      // const messages = messagesStore.getState().messages;
+      // if (!messages.find((m) => m.id === message)) {
+      newMessage({
+        id: `uid-from-${
+          currentContact?.id
+        }-to-${email}-${new Date().getTime()}`,
+        from: email,
+        to: currentContact?.email,
+        content: message,
+        date: new Date(),
+        unread: false,
+        isGroup: false,
+      });
+      // }
     } catch (e) {
       toast("Error sending message 🚨", {
         action: { label: "Try again", onClick: () => sendMessage },
@@ -549,11 +550,88 @@ export default function useXMPPClient() {
         nickname,
       };
       setGroups([...groupsStore.getState().groups, newGroup]);
+      const contact: Contact = {
+        id: jid,
+        email: jid,
+        name: jid.split("@")[0],
+      };
+      setCurrentContact(contact);
       toast("Joined to group ✨");
     } catch (e) {
       console.log("Error joining group:", e);
       toast("Error joining group 🚨");
     }
+  };
+
+  const createGroup = async (groupName: string) => {
+    const client = xmppClientRef.current;
+    const roomJid = `${groupName}@conference.${XMPP_DOMAIN}`;
+
+    // create room
+    await client?.send(
+      xml(
+        "presence",
+        { to: `${roomJid}/${email}` },
+        xml("x", { xmlns: "http://jabber.org/protocol/muc" })
+      )
+    );
+
+    // room config
+    const iqConfig = xml(
+      "iq",
+      { to: roomJid, type: "set", id: "config1" },
+      xml(
+        "query",
+        { xmlns: "http://jabber.org/protocol/muc#owner" },
+        xml(
+          "x",
+          { xmlns: "jabber:x:data", type: "submit" },
+          xml(
+            "field",
+            { var: "FORM_TYPE" },
+            xml("value", {}, "http://jabber.org/protocol/muc#roomconfig")
+          ),
+          xml(
+            "field",
+            { var: "muc#roomconfig_roomname" },
+            xml("value", {}, groupName)
+          ),
+          xml(
+            "field",
+            { var: "muc#roomconfig_roomdesc" },
+            xml("value", {}, "")
+          ),
+          xml(
+            "field",
+            { var: "muc#roomconfig_publicroom" },
+            xml("value", {}, "1")
+          ),
+          xml(
+            "field",
+            { var: "muc#roomconfig_persistentroom" },
+            xml("value", {}, "1")
+          ),
+          xml(
+            "field",
+            { var: "muc#roomconfig_membersonly" },
+            xml("value", {}, "0")
+          ),
+          xml(
+            "field",
+            { var: "muc#roomconfig_allowinvites" },
+            xml("value", {}, "1")
+          )
+        )
+      )
+    );
+    await client?.send(iqConfig);
+
+    const newContact = {
+      id: roomJid,
+      email: roomJid,
+      name: groupName,
+    };
+    setCurrentContact(newContact);
   };
 
   return {
@@ -566,5 +644,6 @@ export default function useXMPPClient() {
     sendFile,
     sendMessage,
     joinGroup,
+    createGroup,
   };
 }

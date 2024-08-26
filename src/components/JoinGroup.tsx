@@ -105,20 +105,23 @@ export default function JoinGroup({ open, closer, joinGroup }: Props) {
               </CardHeader>
               <CardContent className="space-y-2">
                 <ul className="flex flex-col gap-2 h-96 overflow-y-auto">
-                  {groups.map((group, key) => (
-                    <li
-                      key={key}
-                      className="flex border justify-between border-gray-300 p-2 rounded-md"
-                    >
-                      <section className="my-auto">
-                        <span>{group.name}</span>
-                        <p className="text-sm text-gray-400">{group.id}</p>
-                      </section>
-                      <Button onClick={() => handleJoinPublicGroup(group.id)}>
-                        Join
-                      </Button>
-                    </li>
-                  ))}
+                  {groups
+                    // sort by name property
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((group, key) => (
+                      <li
+                        key={key}
+                        className="flex border justify-between border-gray-300 p-2 rounded-md"
+                      >
+                        <section className="my-auto">
+                          <span>{group.name}</span>
+                          <p className="text-sm text-gray-400">{group.id}</p>
+                        </section>
+                        <Button onClick={() => handleJoinPublicGroup(group.id)}>
+                          Join
+                        </Button>
+                      </li>
+                    ))}
                 </ul>
               </CardContent>
             </Card>
