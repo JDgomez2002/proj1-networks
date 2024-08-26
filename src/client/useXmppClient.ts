@@ -10,6 +10,11 @@ import { toast } from "sonner";
 const XMPP_SERVICE = "ws://alumchat.lol:7070/ws/";
 const XMPP_DOMAIN = "alumchat.lol";
 
+/**
+ *
+ * @name useXMPPClient
+ * @description Custom hook to manage the XMPP client connection
+ */
 export default function useXMPPClient() {
   const xmppClientRef = useRef<Client | null>(null);
 
@@ -41,6 +46,10 @@ export default function useXMPPClient() {
     };
   }, []);
 
+  /**
+   * @name getContacts
+   * @description Get the contacts from the roster on "online" event
+   */
   const getContacts = useCallback(
     async (xmppClientInstance: Client) => {
       if (!xmppClientInstance) return;
@@ -67,6 +76,10 @@ export default function useXMPPClient() {
     [setContacts]
   );
 
+  /**
+   * @name instanceClient
+   * @description Create the XMPP client instance, handling online, stanzas, errors, offline events as needed
+   */
   const instanceClient = useCallback(() => {
     const clientInstance = client({
       service: XMPP_SERVICE,
@@ -328,6 +341,10 @@ export default function useXMPPClient() {
     return clientInstance;
   }, [email, password, setStatus, getContacts]);
 
+  /**
+   * @name logout
+   * @description Close the XMPP connection and navigate to the login page
+   */
   const logout = () => {
     const client = xmppClientRef.current;
     client?.stop();
@@ -335,6 +352,10 @@ export default function useXMPPClient() {
     navigate("/");
   };
 
+  /**
+   * @name acceptRequest
+   * @description Accept a contact request
+   */
   const acceptRequest = async (contactId: string) => {
     try {
       const client = xmppClientRef.current;
@@ -364,6 +385,10 @@ export default function useXMPPClient() {
     }
   };
 
+  /**
+   * @name sendRequest
+   * @description Send a friend request
+   */
   const sendRequest = async (jid: string) => {
     if (!jid || !jid.includes("@alumchat.lol")) {
       toast("Please enter a valid JID 🚨", {
@@ -391,6 +416,10 @@ export default function useXMPPClient() {
     }
   };
 
+  /**
+   * @name updatePresenceMessage
+   * @description Update the presence message
+   */
   const updatePresenceMessage = async (message: string) => {
     const client = xmppClientRef.current;
     try {
@@ -402,6 +431,10 @@ export default function useXMPPClient() {
     }
   };
 
+  /**
+   * @name deleteAccount
+   * @description Delete the user account
+   */
   const deleteAccount = async () => {
     const client = xmppClientRef.current;
     try {
@@ -421,6 +454,10 @@ export default function useXMPPClient() {
     }
   };
 
+  /**
+   * @name getFileSlot
+   * @description Get the file slot to upload the file
+   */
   const getFileSlot = async (file: File) => {
     const client = xmppClientRef.current;
     const slotRequest = xml(
@@ -467,6 +504,10 @@ export default function useXMPPClient() {
     }
   };
 
+  /**
+   * @name sendMessage
+   * @description Send a message to a contact or group
+   */
   const sendMessage = async (message: string, groupJid?: string) => {
     const client = xmppClientRef.current;
     if (!client) return;
@@ -513,6 +554,10 @@ export default function useXMPPClient() {
     }
   };
 
+  /**
+   * @name joinGroup
+   * @description Join a public or private group
+   */
   const joinGroup = async (
     jid: string,
     nickname: string,
@@ -563,6 +608,10 @@ export default function useXMPPClient() {
     }
   };
 
+  /**
+   * @name createGroup
+   * @description Create a new group
+   */
   const createGroup = async (groupName: string) => {
     const client = xmppClientRef.current;
     const roomJid = `${groupName}@conference.${XMPP_DOMAIN}`;
