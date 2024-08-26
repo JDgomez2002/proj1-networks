@@ -3,8 +3,8 @@
 This project is a XMPP chat that consumes the domain: alumchat.lol
 
 To install the project (had to install yarn globally), clone the repository and then run 👾:
-yarn install
-yarn dev
+1. yarn install
+2. yarn dev
 
 ### Features 🚀
 1) Registrar una nueva cuenta en el servidor
