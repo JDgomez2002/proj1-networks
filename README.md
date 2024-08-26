@@ -1,50 +1,21 @@
-# React + TypeScript + Vite
+# XMPP chat 💬
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a XMPP chat that consumes the domain: alumchat.lol
 
-Currently, two official plugins are available:
+To install the project (had to install yarn globally), clone the repository and then run 👾:
+yarn install
+yarn dev
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+### Features 🚀
+1) Registrar una nueva cuenta en el servidor
+2) Iniciar sesión con una cuenta
+3) Cerrar sesión con una cuenta
+4) Eliminar la cuenta del servidor
+1) Mostrar todos los contactos y su estado
+2) Agregar un usuario a los contactos
+3) Mostrar detalles de contacto de un usuario
+4) Comunicación 1 a 1 con cualquier usuario/contacto
+5) Participar en conversaciones grupales
+6) Definir mensaje de presencia
+7) Enviar/recibir notificaciones
+8) Enviar/recibir archivos
