@@ -51,6 +51,7 @@ export default function JoinGroup({ open, closer, joinGroup }: Props) {
 
     try {
       await joinGroup(groupId, nickname);
+      closer(false);
     } catch (e) {
       console.log("Error joining public group:", e);
       toast("Error joining public group 🚨");
@@ -79,15 +80,15 @@ export default function JoinGroup({ open, closer, joinGroup }: Props) {
           <DialogTitle className="text-3xl">Join group</DialogTitle>
           <DialogDescription>
             Select a public or private group to join
-            <div className="space-y-1 mt-4">
-              <Label htmlFor="name">Nickname</Label>
-              <Input
-                id="name"
-                onChange={(e) => setNickname(e.currentTarget.value)}
-              />
-            </div>
           </DialogDescription>
         </DialogHeader>
+        <section className="space-y-1 mt-4">
+          <Label htmlFor="name">Nickname</Label>
+          <Input
+            id="name"
+            onChange={(e) => setNickname(e.currentTarget.value)}
+          />
+        </section>
         <Tabs defaultValue="account" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="account">Public</TabsTrigger>

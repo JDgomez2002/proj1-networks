@@ -33,6 +33,7 @@ declare global {
     members: string[];
     messages: Message[];
     isPublic: boolean;
+    nickname?: string;
   }
 }
 

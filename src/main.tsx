@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Chat, SelectChat } from "./components";
+// import { Chat, SelectChat } from "./components";
 import { Login, Register } from "./pages";
 import { Toaster } from "./components/ui/sonner";
 
@@ -19,16 +19,16 @@ const router = createBrowserRouter([
   {
     path: "/chat",
     element: <App />,
-    children: [
-      {
-        path: "/chat",
-        element: <SelectChat />,
-      },
-      {
-        path: "/chat/:id",
-        element: <Chat />,
-      },
-    ],
+    // children: [
+    //   {
+    //     path: "/chat",
+    //     element: <SelectChat />,
+    //   },
+    // {
+    //   path: "/chat/:id",
+    //   element: <Chat />,
+    // },
+    // ],
   },
 ]);
 

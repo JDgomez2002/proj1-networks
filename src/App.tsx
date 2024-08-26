@@ -1,8 +1,9 @@
 import "./App.css";
 import { Dispatch, SetStateAction } from "react";
 import { Contacts } from "./layout";
-import { Outlet } from "react-router-dom";
 import { toast } from "sonner";
+import Chat from "./components/Chat";
+import contactsStore from "./stores/contacts.store";
 import useXMPPClient from "./client/useXmppClient";
 
 function App() {
@@ -12,7 +13,12 @@ function App() {
     sendRequest,
     updatePresenceMessage,
     deleteAccount,
+    joinGroup,
+    sendMessage,
+    sendFile,
   } = useXMPPClient();
+
+  const currentContactId = contactsStore((state) => state.currentContact?.id);
 
   const handleAcceptRequest = async (contactId: string) => {
     try {
@@ -57,9 +63,14 @@ function App() {
         sendRequest={handleSendRequest}
         updatePresenceMessage={handleUpdatePresenceMessage}
         deleteAccount={deleteAccount}
+        joinGroup={joinGroup}
       />
       <main className="bg-[#12455e] border border-gray-600 h-full w-full rounded-lg overflow-hidden">
-        <Outlet />
+        <Chat
+          id={currentContactId}
+          sendMessage={sendMessage}
+          sendFile={sendFile}
+        />
       </main>
     </article>
   );

@@ -1,5 +1,6 @@
-import { Link, useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import messagesStore from "../stores/messages.store";
+import contactsStore from "../stores/contacts.store";
 import { Avatar, AvatarFallback } from "../components/ui/avatar";
 
 interface Props {
@@ -7,13 +8,16 @@ interface Props {
 }
 
 function Contact({ contact }: Props) {
-  const { id } = useParams();
+  const id = contactsStore((state) => state.currentContact?.id);
+  const setCurrentContact = contactsStore((state) => state.setCurrentContact);
 
   const messages = messagesStore((state) => state.messages);
 
   return (
-    <Link
-      to={`/chat/${contact.id}`}
+    <button
+      type="button"
+      // to={`/chat/${contact.id}`}
+      onClick={() => setCurrentContact(contact)}
       className={`p-4 h-fit w-full border gap-2 rounded-md flex transition-all duration-300 ease-in-out hover:scale-105 ${
         id === contact.id
           ? "bg-blue-900 border-gray-400"
@@ -42,7 +46,7 @@ function Contact({ contact }: Props) {
           </span>
         )}
       </section>
-    </Link>
+    </button>
   );
 }
 

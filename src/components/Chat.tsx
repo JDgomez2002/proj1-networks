@@ -1,17 +1,25 @@
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import { File } from "lucide-react";
 import { Message } from "./";
 import { useRef, useEffect, useState, FormEvent } from "react";
 import contactsStore from "../stores/contacts.store";
 import messagesStore from "../stores/messages.store";
-import useXMPPClient from "../client/useXmppClient";
+import groupsStore from "../stores/groups.store";
+// import useXMPPClient from "../client/useXmppClient";
 import SendFile from "./SendFile";
 import ContactInfo from "./ContactInfo";
+import SelectChat from "./SelectChat";
 
-function Chat() {
-  const { id } = useParams();
+interface Props {
+  id: string | undefined;
+  sendMessage: (message: string, to?: string) => Promise<void>;
+  sendFile: (file: File, to?: string) => Promise<void>;
+}
 
-  const { sendMessage, sendFile } = useXMPPClient();
+function Chat({ id, sendMessage, sendFile }: Props) {
+  // const { id } = useParams();
+
+  // const { sendMessage, sendFile } = useXMPPClient();
 
   const messagesContainerRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -23,6 +31,7 @@ function Chat() {
   const currentContact = contactsStore((state) => state.currentContact);
   const setCurrentContact = contactsStore((state) => state.setCurrentContact);
   const updateReadStatus = contactsStore((state) => state.updateReadStatus);
+  const groups = groupsStore((state) => state.groups);
 
   const [contactInfoDialog, setContactInfoDialog] = useState<boolean>(false);
   const [sendFileDialog, setSendFileDialog] = useState<boolean>(false);
@@ -49,7 +58,14 @@ function Chat() {
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!message.trim()) return;
-    await sendMessage(message);
+
+    const groupJid = groups.find((group) => group.id === id)?.id;
+
+    if (groupJid) {
+      await sendMessage(message, groupJid);
+    } else {
+      await sendMessage(message);
+    }
 
     setMessage("");
     inputRef.current?.focus();
@@ -57,11 +73,7 @@ function Chat() {
   };
 
   if (!currentContact) {
-    return (
-      <article className="h-full w-full flex items-center justify-center">
-        Loading chat...
-      </article>
-    );
+    return <SelectChat />;
   }
 
   return (

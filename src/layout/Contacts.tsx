@@ -20,6 +20,11 @@ interface Props {
     closer: Dispatch<SetStateAction<boolean>>
   ) => void;
   deleteAccount: () => Promise<void>;
+  joinGroup: (
+    jid: string,
+    nickname: string,
+    password?: string
+  ) => Promise<void>;
 }
 
 function Contacts({
@@ -28,6 +33,7 @@ function Contacts({
   sendRequest,
   updatePresenceMessage,
   deleteAccount,
+  joinGroup,
 }: Props) {
   const contacts = contactsStore((state) => state.contacts);
   const name = userStore((state) => state.user?.name);
@@ -138,7 +144,7 @@ function Contacts({
       <JoinGroup
         open={joinGroupDialog}
         closer={setJoinGroupDialog}
-        joinGroup={undefined}
+        joinGroup={joinGroup}
       />
     </nav>
   );

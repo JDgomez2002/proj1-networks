@@ -147,6 +147,7 @@ export default function useXMPPClient() {
             date: new Date(),
             unread: false,
           };
+          console.log("new Message:", message);
           // add the message to messages store, just if the message is not already in the messages list
           if (!messages.find((m) => m.id === message.id)) {
             const currentContact = contactsStore.getState().currentContact;
@@ -465,21 +466,29 @@ export default function useXMPPClient() {
     }
   };
 
-  const sendMessage = async (message: string) => {
+  const sendMessage = async (message: string, groupJid?: string) => {
     const client = xmppClientRef.current;
     if (!client) return;
     if (!message.trim()) return;
 
     const currentContact = contactsStore.getState().currentContact;
+    console.log("Sending message to:", currentContact?.id);
 
     try {
-      await client.send(
-        xml(
-          "message",
-          { type: "chat", to: currentContact?.id },
-          xml("body", {}, message)
-        )
+      const msg = xml(
+        "message",
+        {
+          type: groupJid ? "groupchat" : "chat",
+          to: currentContact?.id,
+          id: `msg-${email}-${Date.now()}`,
+        },
+        xml("body", {}, message)
       );
+      await client.send(msg);
+
+      console.log("Message sent:", msg.toString());
+
+      if (groupJid) return;
 
       // verify if the message is already in the messages list
       const messages = messagesStore.getState().messages;
@@ -503,6 +512,50 @@ export default function useXMPPClient() {
     }
   };
 
+  const joinGroup = async (
+    jid: string,
+    nickname: string,
+    password?: string
+  ) => {
+    try {
+      const client = xmppClientRef.current;
+      const stanza = password
+        ? xml(
+            "presence",
+            { to: `${jid}/${nickname}`, id: `join-${Date.now().toString()}` },
+            xml(
+              "x",
+              { xmlns: "http://jabber.org/protocol/muc" },
+              xml("history", { maxstanzas: "20" }), // Request last 20 messages
+              xml("password", {}, password)
+            )
+          )
+        : xml(
+            "presence",
+            { to: `${jid}/${nickname}`, id: `join-${Date.now().toString()}` },
+            xml(
+              "x",
+              { xmlns: "http://jabber.org/protocol/muc" },
+              xml("history", { maxstanzas: "20" }) // Request last 20 messages
+            )
+          );
+      await client?.send(stanza);
+      const newGroup: Group = {
+        id: jid,
+        name: jid.split("@")[0],
+        members: [],
+        messages: [],
+        isPublic: false,
+        nickname,
+      };
+      setGroups([...groupsStore.getState().groups, newGroup]);
+      toast("Joined to group ✨");
+    } catch (e) {
+      console.log("Error joining group:", e);
+      toast("Error joining group 🚨");
+    }
+  };
+
   return {
     client: xmppClientRef.current,
     logout,
@@ -512,5 +565,6 @@ export default function useXMPPClient() {
     deleteAccount,
     sendFile,
     sendMessage,
+    joinGroup,
   };
 }
