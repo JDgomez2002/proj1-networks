@@ -6,6 +6,11 @@ To install the project (had to install yarn globally), clone the repository and 
 1. yarn install
 2. yarn dev
 
+### Presentacion
+https://youtu.be/RFkiYLzVuTc?si=BVRuclYUcWf_C9A1
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/RFkiYLzVuTc/0.jpg)](https://www.youtube.com/watch?v=RFkiYLzVuTc)
+
 ### Features 🚀
 1) Registrar una nueva cuenta en el servidor
 2) Iniciar sesión con una cuenta
