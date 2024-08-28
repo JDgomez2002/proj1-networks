@@ -6,7 +6,10 @@ To install the project (had to install yarn globally), clone the repository and 
 1. yarn install
 2. yarn dev
 
-### Presentacion
+### Documentation
+The file documented is the useXmppClient.ts in the ./src/client directory
+
+### Presentation
 https://youtu.be/RFkiYLzVuTc?si=BVRuclYUcWf_C9A1
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/RFkiYLzVuTc/0.jpg)](https://www.youtube.com/watch?v=RFkiYLzVuTc)
